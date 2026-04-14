@@ -1,6 +1,6 @@
 function Search({ city, setCity, getWeather }) { 
     return (
-        <div style={{ marginBottom: "20px" }} >
+        <div style={style.searchBox}>
 
             <input
                 type="text"
@@ -23,23 +23,28 @@ function Search({ city, setCity, getWeather }) {
 }  
 
 const style = {
-  input: {
-    padding: "12px",
-    width: "220px",
-    borderRadius: "8px",
-    border: "none",
-    marginRight: "10px",
-    outline: "none",
-  },
- button: {
-    adding: "12px 18px",
-    border: "none",
-    backgroundColor: "#333",
-    color: "white",
-    borderRadius: "8px",
-    cursor: "pointer",
-    marginTop: "20px",
-  }
+    searchBox: {
+        display: "flex",
+        gap: "10px",
+        marginBottom: "20px",
+        },
+    input: {
+        padding: "12px",
+        width: "250px",
+        borderRadius: "8px",
+        border: "none",
+        marginRight: "10px",
+        outline: "none",
+    },
+    button: {
+        adding: "18px 18px",
+        border: "none",
+        backgroundColor: "#0c4645",
+        color: "white",
+        borderRadius: "10px",
+        cursor: "pointer",
+        marginTop: "3px",
+    }
 };
 
 export default Search;

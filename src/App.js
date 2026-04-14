@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect} from "react";
 import Search from "./components/Search";
 import WeatherCard from "./components/WeatherCard";
  import './app.css';
@@ -13,22 +13,83 @@ function App() {
   const randomTemp = Math.floor(Math.random() * 15) + 20;
 
 
+ const getVideo = () => {
+  const condition = weather?.weather?.[0]?.main;
+
+  console.log("Weather condition:", condition);
+
+  if (!condition) {
+    return "https://cdn.pixabay.com/video/2025/02/23/260397_large.mp4";
+  }
+
+  if (condition === "Rain") {
+    return "https://cdn.pixabay.com/video/2024/05/15/212102_large.mp4";
+  }
+
+  if (condition === "Clouds") {
+    return "https://cdn.pixabay.com/video/2022/08/09/127351-738456858_large.mp4";
+  }
+
+  if (condition === "Clear") {
+    return "https://cdn.pixabay.com/video/2021/03/22/68703-528689481_large.mp4";
+  }
+
+  return "https://cdn.pixabay.com/video/2025/02/23/260397_large.mp4";
+};
+
+
   const demoWeather = {
-      main: {
-        temp: randomTemp,
-        humidity: 60 + Math.floor(Math.random() * 20),
-      },
-      weather: [
-        {
-          description: "clear sky",
-          icon: "01d",
-        },
-      ],
-      wind: {
-        speed: Math.floor(Math.random() * 10),
-      },
-    };
-      
+  main: {
+    temp: randomTemp,
+    humidity: 60 + Math.floor(Math.random() * 20),
+  },
+  weather: [
+    {
+      main: "Clear",
+      description: "clear sky",
+      icon: "01d",
+    },
+  ],
+  wind: {
+    speed: Math.floor(Math.random() * 10),
+  },
+};
+
+
+
+   const getLocationWeather = () => {
+  setLoading(true);
+  setError("");
+  setWeather(null);
+
+  navigator.geolocation.getCurrentPosition(
+    async (pos) => {
+      try {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+
+        const apiKey = "0173f4977512b3f68801dc49f4f75a9a";
+
+        const response = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
+        );
+
+        const data = await response.json();
+
+        setWeather(data);
+      } catch (err) {
+        setError("Failed to fetch location weather");
+      } finally {
+        setLoading(false);
+      }
+    },
+    () => {
+      setError("Location permission denied ❌");
+      setLoading(false);
+    }
+  );
+};
+
   const getWeather = async () => {
     setError("");     
     setWeather(null);
@@ -45,7 +106,7 @@ function App() {
       setLoading(true);
       // setError("");
 
-    const apiKey = "YOUR_API_KEY"; // Replace with your OpenWeatherMap API key
+    const apiKey = "0173f4977512b3f68801dc49f4f75a9a"; 
 
     const response = await fetch(
       `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`
@@ -63,11 +124,26 @@ function App() {
     }
   };
 
+
+  useEffect(() => {
+  getLocationWeather();
+}, []);
+  
+
+    
   return (
 
     <>
-      <video autoPlay loop muted style={style.videoBg}>
-        <source src="https://media.istockphoto.com/id/1125217870/video/time-lapse-sunrise-over-mountain-with-mist-and-fog-cloud.mp4?s=mp4-640x640-is&k=20&c=gJhYDCEdJQXa1OobqkcK995cZhpIWUcgQwJlKUxEHNs=" type="video/mp4" />
+
+      <video
+        key={weather?.name || "default"} // 🔥 better key
+        autoPlay
+        loop
+        muted
+        playsInline
+        style={style.videoBg}
+      >
+        <source src={getVideo()} type="video/mp4" />
       </video>
 
     <div style={style.overlay}></div>
@@ -98,13 +174,13 @@ function App() {
         </p></strong>
         )}
 
-      <Search city={city} setCity={setCity} getWeather={getWeather} />
+      <Search city={city} setCity={setCity} getWeather={getWeather} getLocation={getLocationWeather} />
 
       {loading && <p style={style.loading}>Loading...</p>}
       {error && <p style={style.error}>{error}</p>}
       
       {weather && <WeatherCard weather={weather} />}
-    
+          
     </div>
 
   </>
@@ -114,7 +190,7 @@ function App() {
 const style = {
   container: {
     transition: "all 0.5s ease",
-    minHeight: "97vh",
+    minHeight: "100vh",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -124,8 +200,10 @@ const style = {
     
   },
   title: {
-    // color: "#a7a890",
-    marginBottom: "20px",
+     fontSize: "42px",
+  fontWeight: "bold",
+  letterSpacing: "1px",
+  textShadow: "2px 2px 10px rgba(0,0,0,0.5)",
   },
   loading: {
     color: "white",
@@ -158,14 +236,14 @@ const style = {
     fontFamily: "math",
   },
 
-  videoBg: {
+ videoBg: {
   position: "fixed",
   top: 0,
   left: 0,
-  width: "100%",
-  height: "100%",
+  width: "100vw",
+  height: "100vh",
   objectFit: "cover",
-  zIndex: "-2",
+  zIndex: "-10", // 🔥 force behind everything
 },
 
 overlay: {
@@ -175,7 +253,7 @@ overlay: {
   width: "100%",
   height: "100%",
   background: "linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4))",
-  zIndex: "-1",
+  zIndex: "-1", // 
 },
 
 };

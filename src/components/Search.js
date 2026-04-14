@@ -1,4 +1,5 @@
-function Search({ city, setCity, getWeather }) { 
+function Search({ city, setCity, getWeather, getLocation }) { 
+
     return (
         <div style={style.searchBox}>
 
@@ -15,6 +16,9 @@ function Search({ city, setCity, getWeather }) {
                 style={style.input}
             />
             <br />
+            <button style={style.button} onClick={getLocation}>
+                Use My Location 📍
+                </button>
             <button style={style.button} onClick={getWeather} disabled={!city}>
                 Get Weather
             </button> 
@@ -39,11 +43,15 @@ const style = {
     button: {
         adding: "18px 18px",
         border: "none",
-        backgroundColor: "#0c4645",
+        // backgroundColor: "#0c4645",
         color: "white",
         borderRadius: "10px",
         cursor: "pointer",
         marginTop: "3px",
+        background: "linear-gradient(135deg, #00c6ff, #0072ff)",
+        borderRadius: "10px",
+        padding: "10px 20px",
+        cursor: "pointer",
     }
 };
 
